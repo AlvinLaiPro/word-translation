@@ -41,10 +41,10 @@
   "description": "Command line tool for batch translation of words",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AlvinLaiPro/words-translation.git"
+    "url": "git+https://github.com/AlvinLaiPro/word-translation.git"
   },
   "bugs": {
-    "url": "https://github.com/AlvinLaiPro/words-translation/issues"
+    "url": "https://github.com/AlvinLaiPro/word-translation/issues"
   },
-  "homepage": "https://github.com/AlvinLaiPro/words-translation#readme"
+  "homepage": "https://github.com/AlvinLaiPro/word-translation#readme"
 }
