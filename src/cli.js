@@ -24,15 +24,16 @@ function parseArgsIntoOptions(args) {
 
 const validatePath = (val) => {
     try {
+        const supportTypes = ['.docx', '.json'];
         const {ext} = path.parse(val);
 
-        if (['.docx', '.json'].includes(ext)) {
+        if (supportTypes.includes(ext)) {
             return true;
         }
 
-        return 'The file type is not correct';
+        return  `The file type is not correct, we support ${supportTypes.join(', ')}`;
     } catch (err) {
-        return 'The file type is not correct';
+        return 'Seems the input is not a correct file path';
     }
 }
 
@@ -44,7 +45,7 @@ async function promptForMissingOptions(options) {
         questions.push({
             type: 'input',
             name: 'source',
-            message: 'Please enter the .docx file path your want to translate',
+            message: 'Please enter the .docx/.json file path your want to translate:',
             validate: validatePath,
         })
     }
