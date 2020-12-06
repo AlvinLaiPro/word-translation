@@ -1,6 +1,6 @@
 {
   "name": "@alvinlai/word-translation",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "./src/tranlateFile.js",
   "license": "MIT",
   "dependencies": {
