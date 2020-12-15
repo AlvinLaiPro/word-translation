@@ -1,24 +1,21 @@
 const puppeteer = require('puppeteer');
+const ProgressBar = require('progress');
 
 function transformTexts(pro, con, extra) {
     let result = '';
+    let sep = '\n';
     if (pro) {
-        pro = pro.split('\n').map(s => s.trim()).filter(item => item.length);
+        pro = pro.split(sep).map(s => s.trim()).filter(item => item.length);
 
-        // if (pro.length > 3) {
-        //     pro.shift();
-        //     pro.shift();
-        // }
-
-        result = pro.join(' ');
+        result = `${sep}${pro.join(' ')}`;
     }
 
     if (con) {
-        result = `${result}\n${con.split('\n').map(s => s.trim()).filter(item => item.length).join('\n')}`;
+        result = `${result}${sep}${con.split(sep).map(s => s.trim()).filter(item => item.length).join(sep)}`;
     }
 
     if (extra) {
-        result = `${result}\n${extra.split('\n').map(s => s.trim()).filter(item => item.length).join(' ')}`
+        result = `${result}${sep}${extra.split(sep).map(s => s.trim()).filter(item => item.length).join(' ')}`
     }
 
     return result;
@@ -49,7 +46,7 @@ function transformTexts(pro, con, extra) {
 //         }
 
 //     });
-    
+
 //     var tableStyle = {
 //         tableColWidth: 4261,
 //         tableSize: 24,
@@ -60,7 +57,7 @@ function transformTexts(pro, con, extra) {
 //     docx.createTable (table);
 
 //     var out = fs.createWriteStream( path.join(__dirname, 'out.docx') );
- 
+
 //     docx.generate ( out );
 //     out.on ( 'close', function () {
 //         console.log ( 'Finished to create the word file!' );
@@ -74,17 +71,34 @@ function transformTexts(pro, con, extra) {
 // }
 
 async function translate(words) {
-    const browser = await puppeteer.launch({headless: true,defaultViewport: {width: 2000, height: 2000}});
+    let browser = null;
+    try {
+    browser = await puppeteer.launch({headless: true,defaultViewport: {width: 2000, height: 2000}});
     const page = await browser.newPage();
 
-    await page.goto('http://dict.youdao.com/search', {
-        waitUntil: 'networkidle0',
-    });
+    try {
+        await page.goto('http://dict.youdao.com/search', {
+            waitUntil: 'networkidle0',
+            timeout: 0,
+        });
+    } catch (err) {
+        console.log('There appears to be trouble with your network connection. Retrying...')
+        await page.goto('http://dict.youdao.com/search', {
+            waitUntil: 'networkidle0',
+            timeout: 0,
+        });
+    }
 
     const translations = [];
+    const bar = new ProgressBar('   translating [:bar] :percent', {
+        complete: '=',
+        incomplete: ' ',
+        width: 20,
+        total: words.length
+    })
 
-    while (words.length) {
-        const word = words.shift();
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
         const $translateContent = await page.$('#translateContent');
 
         const closeBtn = await page.$('.close.js_close');
@@ -96,7 +110,7 @@ async function translate(words) {
         if ($translateContent === null) {
             await page.evaluate( () => document.getElementById("query").value = "");
             await page.type('#query', word);
-            await page.click('.s-btn');
+            await page.focus('.s-btn');
             await page.click('.s-btn');
         } else {
             await page.evaluate( () => document.getElementById("translateContent").value = "");
@@ -132,11 +146,21 @@ async function translate(words) {
 
 
         translations.push(transformTexts(pro, con, extra));
+        bar.tick(1);
     }
     await browser.close();
     console.log('finish');
 
     return translations;
+}
+
+    catch (err) {
+        if (browser) {
+            await browser.close();
+        }
+
+        throw(err);
+    }
 }
 
 module.exports = translate;
