@@ -29,16 +29,16 @@ module.exports = async ({ source: sourceFilePath, target: targetFilePath, overwr
             });
             docx.save(targetFilePath);
         } else {
-            const source = JSON.parse(fs.readFileSync(sourceFilePath, 'utf8'));
-            const words = Object.keys(source).map(item => item.trim());
+            const source = fs.readFileSync(sourceFilePath, 'utf8');
+            const words = source.split('\n').map(item => item.trim()).filter(item => item.length);
             const translations = await translate(words);
-            const target = words.reduce((acc, cur, index) => {
-                    acc[cur] = translations[index];
+            const codes = [];
 
-                    return acc;
-            }, {});
+            for (let i = 0; i < words.length; i++) {
+                codes.push(`${words[i]}${translations[i]}\n`);
+            }
 
-            fs.writeFileSync(sourceFilePath, JSON.stringify(target));
+            fs.writeFileSync(targetFilePath, codes.join('\n'));
         }
     } catch (err) {
         throw err;

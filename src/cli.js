@@ -24,7 +24,7 @@ function parseArgsIntoOptions(args) {
 
 const validatePath = (val) => {
     try {
-        const supportTypes = ['.docx', '.json'];
+        const supportTypes = ['.docx', '.txt'];
         const {ext} = path.parse(val);
 
         if (supportTypes.includes(ext)) {
@@ -92,6 +92,12 @@ async function promptForMissingOptions(options) {
 
 export async function cli(args) {
     const options = await promptForMissingOptions(parseArgsIntoOptions(args));
-
-    await translateFile(options);
+    try {
+        console.log('start');
+        await translateFile(options);
+    } catch (err) {
+        // try one more time
+        console.error('Seems some error occurs. Retry one more time');
+        await translateFile(options);
+    }
 }
