@@ -118,7 +118,8 @@ async function translate(words) {
             await page.click('#form button');
         }
 
-        const translateBlock = await page.waitForXPath(`//*[@class="keyword"][contains(text(), "${word}")]`);
+        const lowerCaseWord = String(word).toLowerCase();
+        const translateBlock = await page.waitForXPath(`//*[@class="keyword"][contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "${lowerCaseWord}")]`);
 
         if (translateBlock === null) {
             console.log(`not translate for this word: ${word}`);

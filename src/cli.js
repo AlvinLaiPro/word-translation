@@ -18,7 +18,7 @@ function parseArgsIntoOptions(args) {
     return {
         source: options['--source'] || '',
         target: options['--target'] || '',
-        overwrite: options['--overwrite'] || false,
+        overwrite: options['--overwrite'],
     };
 }
 
@@ -64,8 +64,8 @@ async function promptForMissingOptions(options) {
                 name: 'target',
                 message: 'where do you want to save the changes?',
                 validate: validatePath,
-                when: (answers)=> {
-                    if (!answers.overwrite || !options.target) {
+                when: (answers) => {
+                    if (!answers.overwrite && validatePath(options.target) !== true) {
                         return true;
                     }
 
@@ -78,6 +78,13 @@ async function promptForMissingOptions(options) {
                 name: 'target',
                 message: 'where do you want to save the changes?',
                 validate: validatePath,
+                when: (answers) => {
+                    if (answers.overwrite) {
+                        return false;
+                    }
+
+                    return true;
+                }
             });
         }
     }

@@ -1,6 +1,6 @@
 {
   "name": "@alvinlai/word-translation",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./src/tranlateFile.js",
   "license": "MIT",
   "dependencies": {
@@ -29,7 +29,8 @@
     }
   },
   "bin": {
-    "translate": "bin/translate.js"
+    "@alvinlai/word-translation": "./bin/translate.js",
+    "translate": "./bin/translate.js"
   },
   "keywords": [
     "translation",
