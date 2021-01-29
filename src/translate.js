@@ -73,8 +73,8 @@ function transformTexts(pro, con, extra) {
 async function translate(words) {
     let browser = null;
     try {
-    browser = await puppeteer.launch({headless: true,defaultViewport: {width: 2000, height: 2000}});
-    const page = await browser.newPage();
+    browser = await puppeteer.launch({headless: false,defaultViewport: {width: 2000, height: 2000}});
+    let page = await browser.newPage();
 
     try {
         await page.goto('http://dict.youdao.com/search', {
@@ -82,7 +82,11 @@ async function translate(words) {
             timeout: 0,
         });
     } catch (err) {
-        console.log('There appears to be trouble with your network connection. Retrying...')
+        console.log('There appears to be trouble with your network connection. Retrying...');
+        await page.close();
+
+        page = await browser.newPage();
+
         await page.goto('http://dict.youdao.com/search', {
             waitUntil: 'networkidle0',
             timeout: 0,
@@ -104,7 +108,7 @@ async function translate(words) {
         const closeBtn = await page.$('.close.js_close');
 
         if (closeBtn) {
-            await page.click('a.close.js_close');
+            await page.click('.close.js_close');
         }
 
         if ($translateContent === null) {
